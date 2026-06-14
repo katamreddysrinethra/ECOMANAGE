@@ -1,7 +1,18 @@
-import streamlit as st
 import sqlite3
+from typing import Optional
 
-from streamlit_option_menu import option_menu
+try:
+    import streamlit as st
+except ImportError:
+    st = None  # type: ignore
+
+import importlib
+
+try:
+    streamlit_option_menu = importlib.import_module("streamlit_option_menu")
+    option_menu = getattr(streamlit_option_menu, "option_menu", None)
+except ImportError:
+    option_menu = None
 
 from pages.pickup_request import pickup_request_page
 from pages.pickup_history import pickup_history_page
@@ -9,9 +20,23 @@ from pages.rewards import rewards_page
 from pages.complaints import complaints_page
 from pages.impact import impact_page
 from pages.education_hub import education_hub_page
+from pages.ai_scanner import ai_scanner_page
 
 
 DB_NAME = "ecomanage.db"
+
+
+def ensure_streamlit():
+    if st is None:
+        raise ImportError("Streamlit is required to run the citizen dashboard.")
+
+
+def ensure_user_session():
+    ensure_streamlit()
+    if "user" not in st.session_state or not st.session_state.user:
+        st.error("Session expired. Please log in again.")
+        st.session_state.page = "landing"
+        st.rerun()
 
 
 # ==========================================
@@ -244,30 +269,46 @@ def citizen_dashboard():
             f"👤 {st.session_state.user['name']}"
         )
 
-        selected = option_menu(
-            menu_title=None,
-            options=[
-                "Dashboard",
-                "Pickup Request",
-                "Pickup History",
-                "Rewards",
-                "Complaints",
-                "Environmental Impact",
-                "Education Hub",
-                "Logout"
-            ],
-            icons=[
-                "house",
-                "truck",
-                "clock-history",
-                "gift",
-                "chat-left-text",
-                "graph-up",
-                "book",
-                "box-arrow-right"
-            ],
-            default_index=0
-        )
+        menu_options = [
+            "Dashboard",
+            "AI Waste Scanner",
+            "Pickup Request",
+            "Pickup History",
+            "Rewards",
+            "Complaints",
+            "Environmental Impact",
+            "Education Hub",
+            "Logout"
+        ]
+
+        menu_icons = [
+            "house",
+            "truck",
+            "robot",
+            "clock-history",
+            "gift",
+            "chat-left-text",
+            "graph-up",
+            "book",
+            "box-arrow-right"
+        ]
+
+        if option_menu is not None:
+            selected = option_menu(
+                menu_title=None,
+                options=menu_options,
+                icons=menu_icons,
+                default_index=0
+            )
+
+        elif selected == "AI Waste Scanner":
+            ai_scanner_page()    
+        else:
+            selected = st.radio(
+                label="Navigation",
+                options=menu_options,
+                index=0
+            )
 
     # =====================================
     # PAGE ROUTING
@@ -276,6 +317,10 @@ def citizen_dashboard():
     if selected == "Dashboard":
 
         dashboard_home()
+
+    elif selected == "AI Waste Scanner":
+
+        ai_scanner_page()
 
     elif selected == "Pickup Request":
 

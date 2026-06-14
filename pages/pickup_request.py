@@ -1,4 +1,5 @@
-import streamlit as st
+from requests import options
+import streamlit as st  # type: ignore[import]
 import os
 from datetime import date
 
@@ -66,6 +67,16 @@ def pickup_request_page():
         # WASTE TYPE
         # ==================================
 
+        waste_type = st.selectbox(
+    "Waste Type",
+    options,
+    index=options.index(
+        st.session_state.get(
+            "detected_waste",
+            "Plastic"
+        )
+        )
+        )
         waste_type = st.selectbox(
             "Waste Type *",
             [
