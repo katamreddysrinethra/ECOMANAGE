@@ -6,7 +6,231 @@ import bcrypt
 
 DB_NAME = "ecomanage.db"
 
+def add_pickup_request(
+        citizen_id,
+        waste_type,
+        quantity,
+        notes,
+        pickup_date,
+        image_path):
 
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    INSERT INTO pickups(
+        citizen_id,
+        waste_type,
+        quantity,
+        notes,
+        pickup_date,
+        image_path,
+        status
+    )
+    VALUES(?,?,?,?,?,?,?)
+    """,
+    (
+        citizen_id,
+        waste_type,
+        quantity,
+        notes,
+        pickup_date,
+        image_path,
+        "Pending"
+    ))
+
+    conn.commit()
+    conn.close()
+
+def get_user_pickups(citizen_id):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    SELECT
+        id,
+        waste_type,
+        quantity,
+        pickup_date,
+        status,
+        collector_id,
+        image_path,
+        notes
+    FROM pickups
+    WHERE citizen_id=?
+    ORDER BY id DESC
+    """,
+    (citizen_id,))
+
+    pickups = cursor.fetchall()
+
+    conn.close()
+
+    return pickups
+def get_user_name(user_id):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    SELECT name
+    FROM users
+    WHERE id=?
+    """, (user_id,))
+
+    row = cursor.fetchone()
+
+    conn.close()
+
+    if row:
+        return row[0]
+
+    return "Not Assigned"
+def get_reward_points(user_id):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    SELECT points
+    FROM rewards
+    WHERE user_id=?
+    """, (user_id,))
+
+    row = cursor.fetchone()
+
+    conn.close()
+
+    if row:
+        return row[0]
+
+    return 0
+def get_pending_pickups():
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    SELECT
+        id,
+        citizen_id,
+        waste_type,
+        quantity,
+        notes,
+        pickup_date,
+        image_path,
+        status
+    FROM pickups
+    WHERE status='Pending'
+    ORDER BY pickup_date ASC
+    """)
+
+    pickups = cursor.fetchall()
+
+    conn.close()
+
+    return pickups
+def get_collector_pickups(collector_id):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    SELECT
+        id,
+        waste_type,
+        quantity,
+        pickup_date,
+        status
+    FROM pickups
+    WHERE collector_id=?
+    ORDER BY id DESC
+    """, (collector_id,))
+
+    pickups = cursor.fetchall()
+
+    conn.close()
+
+    return pickups
+def accept_pickup(
+        pickup_id,
+        collector_id):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    UPDATE pickups
+    SET
+        collector_id=?,
+        status='Accepted'
+    WHERE id=?
+    """,
+    (
+        collector_id,
+        pickup_id
+    ))
+
+    conn.commit()
+    conn.close()
+def update_pickup_status(
+        pickup_id,
+        status):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    UPDATE pickups
+    SET status=?
+    WHERE id=?
+    """,
+    (
+        status,
+        pickup_id
+    ))
+
+    conn.commit()
+    conn.close()
+def get_pickup_details(pickup_id):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    SELECT
+        citizen_id,
+        waste_type
+    FROM pickups
+    WHERE id=?
+    """,
+    (pickup_id,))
+
+    data = cursor.fetchone()
+
+    conn.close()
+
+    return data
+def add_reward_points(
+        user_id,
+        points):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    UPDATE rewards
+    SET points = points + ?
+    WHERE user_id=?
+    """,
+    (
+        points,
+        user_id
+    ))
+
+    conn.commit()
+    conn.close()            
 def get_connection():
     return sqlite3.connect(DB_NAME, check_same_thread=False)
 

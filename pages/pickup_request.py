@@ -128,9 +128,35 @@ def pickup_request_page():
         # ==================================
 
         if uploaded_image is not None:
-
             st.image(
                 uploaded_image,
                 caption="Uploaded Waste Image",
                 use_column_width=True
             )
+
+
+
+         # ==============================
+         # SUBMIT BUTTON
+         # ==============================
+
+        submit = st.form_submit_button(
+        "🚛 Submit Pickup Request"
+        )
+        if submit:
+            citizen_id = st.session_state.user["id"]
+            image_path = save_uploaded_image(
+                uploaded_image
+                )
+            add_pickup_request(
+                citizen_id,
+                waste_type,
+                quantity,
+                notes,
+                str(pickup_date),
+                image_path
+                )
+            st.success(
+                "Pickup request submitted successfully!"
+                )
+            st.balloons()

@@ -9,7 +9,26 @@ from database.db import (
     get_pickup_details,
     add_reward_points
 )
+def collector_dashboard():
 
+    st.title("♻️ Collector Dashboard")
+
+    tab1, tab2, tab3 = st.tabs(
+        [
+            "Available Pickups",
+            "My Pickups",
+            "Statistics"
+        ]
+    )
+
+    with tab1:
+        available_pickups_tab()
+
+    with tab2:
+        my_pickups_tab()
+
+    with tab3:
+        statistics_tab()
 
 # ==========================================
 # REWARD CALCULATION
