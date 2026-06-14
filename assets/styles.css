@@ -1,0 +1,50 @@
+.main {
+    padding-top: 1rem;
+}
+
+.stButton > button {
+    width: 100%;
+    border-radius: 12px;
+    height: 45px;
+    font-weight: 600;
+}
+
+.eco-card {
+    padding: 20px;
+    border-radius: 15px;
+    background-color: #f5fff5;
+    border: 1px solid #d8f0d8;
+    margin-bottom: 10px;
+}
+
+.eco-title {
+    text-align: center;
+    color: #2e7d32;
+    font-size: 40px;
+    font-weight: bold;
+}
+
+.eco-subtitle {
+    text-align: center;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.metric-card {
+    padding: 15px;
+    border-radius: 10px;
+    background-color: #fafafa;
+    border: 1px solid #e0e0e0;
+}
+
+.sidebar .sidebar-content {
+    background-color: #f4fff4;
+}
+
+.leaderboard-card {
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    border-left: 5px solid green;
+    background-color: #ffffff;
+}
